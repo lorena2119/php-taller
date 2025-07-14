@@ -1,6 +1,7 @@
 CREATE DATABASE IF NOT EXISTS taller_api;
 
 USE taller_api;
+
 -- Tabla de categorías
 CREATE TABLE categorias (
     id INT AUTO_INCREMENT PRIMARY KEY,
