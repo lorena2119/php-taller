@@ -20,10 +20,10 @@ switch ($metodo) {
                 echo json_encode(['error' => 'ID no encontrado', 'code' => 404, 'errorUrl' => 'https://http.cat/images/404.jpg']);
             }
         } else {
-        $stm = $pdo->prepare("SELECT id, nombre, precio, categoria_id FROM productos");
-        $stm->execute();
-        $response = $stm->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode($response);
+            $stm = $pdo->prepare("SELECT id, nombre, precio, categoria_id FROM productos");
+            $stm->execute();
+            $response = $stm->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($response);
         }
         
         break;
@@ -39,5 +39,23 @@ switch ($metodo) {
         $data['id'] = $pdo->lastInsertId();
         echo json_encode($data);
         break;
-   
+   case 'PUT':
+        if (!$id) {
+            http_response_code(400);
+            echo json_encode(['error' => 'ID no encontrado', 'code' => 404, 'errorUrl' => 'https://http.cat/images/404.jpg']);
+            exit;
+        }
+        $data = json_decode(file_get_contents('php://input'), true);
+        $stm = $pdo->prepare("UPDATE productos SET id=?, nombre=?, precio=?, categoria_id =? WHERE id = ?");
+        $stm->execute(
+            [
+                $data['id'],
+                $data['nombre'],
+                $data['precio'],
+                $data['categoria_id'],
+                $id
+            ]
+        );
+        echo json_encode($data);
+        break;
 }
