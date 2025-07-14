@@ -58,4 +58,29 @@ switch ($metodo) {
         );
         echo json_encode($data);
         break;
+     case 'DELETE':
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$id) {
+            http_response_code(400);
+            echo json_encode(['error' => 'ID no encontrado', 'code' => 404, 'errorUrl' => 'https://http.cat/images/404.jpg']);
+            exit;
+        }
+        $stm1 = $pdo->prepare("SELECT id, nombre, precio, categoria_id FROM productos WHERE id=?");
+        $stm1->execute([
+            $id,
+        ]);
+        $stm1->execute();
+        $response = $stm1->fetch(PDO::FETCH_ASSOC);
+        $stm = $pdo->prepare("DELETE FROM productos WHERE id = ?");
+        $stm->execute([
+            $id,
+        ]);
+        if ($stm->rowCount() > 0) {
+            echo json_encode($response);
+        }else{
+            http_response_code(400);
+            echo json_encode(['error' => 'No se pudo eliminar este registro porque no existe', 'code' => 400, 'errorUrl' => 'https://http.cat/images/400.jpg']);
+            exit;
+        }
+        break;
 }
