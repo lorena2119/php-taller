@@ -9,7 +9,7 @@ switch ($metodo) {
     case 'GET':
         // Realizar SELECT
         if ($id != null) {
-            $stm1 = $pdo->prepare("SELECT id, nombre, precio, categoria_id FROM productos WHERE id = ?");
+            $stm1 = $pdo->prepare("SELECT p.id, p.nombre, p.precio, p.categoria_id, c.nombre as nombreCategoria, pr.descripcion AS promocion, pr.descuento FROM productos as p INNER JOIN categorias as c ON p.categoria_id = c.id LEFT JOIN promociones as pr ON pr.producto_id = p.id WHERE p.id = ?");
             $stm1->execute([$id]);
             $response = $stm1->fetch(PDO::FETCH_ASSOC);
         
@@ -27,5 +27,17 @@ switch ($metodo) {
         }
         
         break;
-    
+    case 'POST':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $stm = $pdo->prepare("INSERT INTO productos(nombre, precio, categoria_id) VALUES(?, ?, ?)");
+        $stm->execute([
+            $data['nombre'],
+            $data['precio'],
+            $data['categoria_id']
+        ]);
+        http_response_code(201);
+        $data['id'] = $pdo->lastInsertId();
+        echo json_encode($data);
+        break;
+   
 }
